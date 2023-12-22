@@ -1,0 +1,6 @@
+# Ignore all CSV files in the data directory
+*.csv
+
+
+# Environments
+mlflow_env/
