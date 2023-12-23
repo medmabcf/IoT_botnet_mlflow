@@ -30,6 +30,10 @@ X = df.drop(columns=['class']).values
 Y = df['class'].values
 X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.1, random_state=42)
 
+## For Remote server only(DAGShub)
+
+remote_server_uri="https://dagshub.com/medmabcf/N-BaIoT_mlops.mlflow"
+mlflow.set_tracking_uri(remote_server_uri)
 with mlflow.start_run():
     knn = KNeighborsClassifier(n_neighbors=5)
     knn.fit(X_train, y_train)
@@ -52,6 +56,8 @@ with mlflow.start_run():
     mlflow.log_metric("recall", recall)
     mlflow.log_metric("f1", f1)
     mlflow.log_metric("accuracy", accuracy)
+    
+   
 
     tracking_url_type_store = urlparse(mlflow.get_tracking_uri()).scheme
 
