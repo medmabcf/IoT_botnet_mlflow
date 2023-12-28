@@ -19,7 +19,7 @@ runname = df_mlflow.loc[df_mlflow['metrics.f1_score'].idxmax()]['tags.mlflow.run
 
 app = FastAPI()
 
-#from backend.models import  PredictApiData
+from backend.models import  PredictModel
 
 
 cols = config().columns
@@ -51,6 +51,17 @@ async def get_models_api():
         models_list.append(model.name)
     return models_list
 
+@app.post("/predict")
+async def predict_api(data: PredictModel):
+    print(data)
+    model_name = data.modelname
+    df = pd.DataFrame([data.data], columns = cols)
+    df=preprocessing(df)
+    print(df)
+    model = mlflow.sklearn.load_model(model_uri=f"models:/{model_name}/None")
+    pred = np.round(model.predict_proba(df)[:, 1], 6)
+    print(pred)
+    return {"result": pred[0]}
 
 
 
