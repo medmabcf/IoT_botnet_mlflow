@@ -1,2 +1,11 @@
-mlflow==2.9.2
+streamlit
+mlflow
+numpy
+pandas
+matplotlib
+fastapi
+uvicorn
+scikit-learn
+
+
 
