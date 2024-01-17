@@ -8,10 +8,7 @@ services:
       - MLFLOW_TRACKING_USERNAME=medmabcf 
       - MLFLOW_TRACKING_PASSWORD=25e5112253e2706993d04c88b1965215b9ed6c91 
 
-    ports:
-      - 5000:5000
-    networks:
-      deploy_network:
+   
     container_name: mlflow_container
 
   fastapi:
@@ -26,18 +23,4 @@ services:
       deploy_network:
     container_name: fastapi_container
 
-  streamlit:
-    build: front/
-    environment:
-      - BACKEND_URL=http://fastapi_container:8000
-    depends_on:
-      - fastapi
-    ports:
-      - 8501:8501
-    networks:
-      deploy_network:
-    container_name: streamlit_container
 
-networks:
-  deploy_network:
-    driver: bridge
