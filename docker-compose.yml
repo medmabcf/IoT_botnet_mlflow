@@ -7,8 +7,7 @@ services:
       - MLFLOW_TRACKING_URI=https://dagshub.com/medmabcf/N-BaIoT_mlops.mlflow 
       - MLFLOW_TRACKING_USERNAME=medmabcf 
       - MLFLOW_TRACKING_PASSWORD=25e5112253e2706993d04c88b1965215b9ed6c91 
-    volumes:
-      - mlflow_volume:/path/in/container
+    
     container_name: mlflow_container
 
   fastapi:
@@ -21,13 +20,24 @@ services:
       - 8000:8000
     networks:
       - deploy_network
-    volumes:
-      - fastapi_volume:/path/in/container
+   
     container_name: fastapi_container
+
+  streamlit:
+    build: front/
+    environment:
+      - BACKEND_URL=http://fastapi:8000 
+    depends_on:
+      - fastapi
+    ports:
+      - 8501:8501
+    
+    networks:
+      - deploy_network
+    container_name: streamlit_container
 
 networks:
   deploy_network:
+    driver: bridge
 
-volumes:
-  mlflow_volume:
-  fastapi_volume:
+

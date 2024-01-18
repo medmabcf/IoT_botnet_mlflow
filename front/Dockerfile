@@ -1,13 +1,18 @@
 FROM python:3.9-slim
 
-RUN mkdir /app
+RUN mkdir /front
 
-WORKDIR /app
 
-RUN pip install mlflow numpy pandas matplotlib requests scikit-learn fastapi[all]
+WORKDIR /front
 
-COPY . /app
 
-EXPOSE 8000
+RUN pip install requests numpy pandas matplotlib scikit-learn streamlit
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+COPY . /front
+
+EXPOSE 8501
+
+CMD ["streamlit", "run", "f_main.py"]
+
+
