@@ -1,5 +1,6 @@
 import numpy as np
-from fastapi import FastAPI
+from fastapi import FastAPI,Request
+
 from fastapi import BackgroundTasks
 from urllib.parse import urlparse
 import pandas as pd
@@ -16,10 +17,18 @@ mlflowclient = MlflowClient(
 run_id = df_mlflow.loc[df_mlflow['metrics.f1_score'].idxmax()]['run_id']
 runname = df_mlflow.loc[df_mlflow['metrics.f1_score'].idxmax()]['tags.mlflow.runName']    """
 
+from backend.models import  PredictModel
+from fastapi import FastAPI
+from pydantic import BaseModel
+from typing import Any, Dict
+
+class Item(BaseModel):
+    data: Any
+    modelname: Any
 
 app = FastAPI()
 
-from backend.models import  PredictModel
+
 
 
 cols = config().columns
@@ -51,10 +60,14 @@ async def get_models_api():
         models_list.append(model.name)
     return models_list
 
+
+
+
 @app.post("/predict")
-async def predict_api(data: PredictModel):
-    print(data)
-    model_name = data.modelname
+async def predict(data: PredictModel):
+    
+    model_name = data.model_name
+    print([data.data])
     df = pd.DataFrame([data.data], columns = cols)
     df=preprocessing(df)
     print(df)
@@ -62,6 +75,7 @@ async def predict_api(data: PredictModel):
     pred = np.round(model.predict_proba(df)[:, 1], 6)
     print(pred)
     return {"result": pred[0]}
+
 
 
 

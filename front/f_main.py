@@ -7,7 +7,15 @@ import os
 import numpy as np
 import pandas as pd
 import urllib.request
+import urllib.request
 
+
+def is_docker():
+    try:
+        with open('/proc/1/cgroup', 'rt') as ifh:
+            return 'docker' in ifh.read()
+    except FileNotFoundError:
+        return False
 
 columns = ['ID','Sender_IP','Sender_Port','Target_IP','Target_Port',
                'Transport_Protocol','Duration','AvgDuration','PBS','AvgPBS','TBS',
@@ -18,10 +26,11 @@ local = True
 
 
 if local:
-    BACKEND_URL = "http://fastapi:8000"
+    BACKEND_URL = "http://localhost:8000"
 else:
-    ip = urllib.request.urlopen("http://169.254.169.254/latest/meta-data/public-ipv4").read().decode()
-    BACKEND_URL = str("http://") + str(ip) + str(":8000")
+    if is_docker():
+        # If we're running in a Docker container, use the service name
+        BACKEND_URL = "http://fastapi:8000"
 
 
 MODELS_URL = urllib.parse.urljoin(BACKEND_URL, "models")
@@ -54,6 +63,7 @@ if page == "Predict":
             model_list = response.json()
             model_name = st.selectbox(
                 label="Select your model", options=model_list)
+          
         else:
             st.write("No models found")
     except ConnectionError as e:
@@ -61,32 +71,33 @@ if page == "Predict":
     
     c1, c2, c3 = st.columns(3)
     
-    x1 = c1.text_input("Sender IP:", value='000.000.000.000')
-    x2 = c1.number_input("Sender Port:", min_value=0, max_value=65535)
-    x3 = c1.text_input("Target IP:", value='000.000.000.000')
-    x4 = c1.number_input("Target Port:", min_value=0, max_value=65535)
+    x1 = c1.text_input("Sender IP:", value='255.255.255.255')
+    x2 = c1.number_input("Sender Port:", min_value=0, max_value=65535, value=0)
+    x3 = c1.text_input("Target IP:", value='255.255.255.255')
+    x4 = c1.number_input("Target Port:", min_value=0, max_value=65535, value=0)
     x5 = c1.selectbox("Transport Protocol:", options=['TCP', 'UDP'])
-    x6 = c1.number_input("Duration:")
+    x6 = c1.number_input("Duration:", value=0)
 
-    x7 = c2.number_input("Average Duration:")
-    x8 = c2.number_input("PBS:")
-    x9 = c2.number_input("Average PBS:")
-    x10 = c2.number_input("TBS:")
-    x11 = c2.number_input("PBR:")
-    x12 = c2.number_input("Average PBR:")
+    x7 = c2.number_input("Average Duration:", value=0)
+    x8 = c2.number_input("PBS:", value=0)
+    x9 = c2.number_input("Average PBS:", value=0)
+    x10 = c2.number_input("TBS:", value=0)
+    x11 = c2.number_input("PBR:", value=0)
+    x12 = c2.number_input("Average PBR:", value=0)
 
-    x13 = c3.number_input("TBR:")
-    x14 = c3.number_input("Missed Bytes:")
-    x15 = c3.number_input("Packets Sent:")
-    x16 = c3.number_input("Packets Received:")
-    x17 = c3.number_input("SRPR:")
+    x13 = c3.number_input("TBR:", value=0)
+    x14 = c3.number_input("Missed Bytes:", value=0)
+    x15 = c3.number_input("Packets Sent:", value=0)
+    x16 = c3.number_input("Packets Received:", value=0)
+    x17 = c3.number_input("SRPR:", value=0)
+
         
     df = (x1, x2, x3, x4, 1, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17)
     print(df)
 
 
     if st.button("Predict"):
-    
+        print(PREDICT_URL)
         try:
             response_predict = requests.post(url=PREDICT_URL,
                                               data=json.dumps({"data": df, "model_name": model_name})
@@ -94,6 +105,7 @@ if page == "Predict":
             print("Response sent!")
             print(response_predict)
             if response_predict.ok:
+                print(response_predict.status_code)
                 print("Response Code:", response_predict.status_code)
                 res = response_predict.json()
                 st.markdown(f"**Prediction**: {res['result']}")

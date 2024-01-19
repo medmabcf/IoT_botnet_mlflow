@@ -1,6 +1,6 @@
-from typing import Any, Optional, Union
+from typing import Any
 from pydantic import BaseModel
 
 class PredictModel(BaseModel):
-    modelname: str
+    model_name: str
     data: Any

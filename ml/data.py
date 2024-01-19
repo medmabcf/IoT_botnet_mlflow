@@ -8,13 +8,13 @@ from sklearn.model_selection import train_test_split
 
 
 class config:
-    columns = ['ID','Sender_IP','Sender_Port','Target_IP','Target_Port',
+    columns = ['Sender_IP','Sender_Port','Target_IP','Target_Port',
                'Transport_Protocol','Duration','AvgDuration','PBS','AvgPBS','TBS',
-               'PBR','AvgPBR','TBR','Missed_Bytes','Packets_Sent','Packets_Received','SRPR','class']
+               'PBR','AvgPBR','TBR','Missed_Bytes','Packets_Sent','Packets_Received','SRPR']
     
 def preprocessing(df):
   # Drop the 'ID' column from the dataframe
-  df = df.drop(columns=['ID'])
+  #df = df.drop(columns=['ID'])
 
   # Replace the strings 'nan' and 'infinity' with numpy's representation of NaN
   df.replace(['nan', 'infinity'], np.nan, inplace=True)
