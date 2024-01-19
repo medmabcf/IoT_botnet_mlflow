@@ -18,7 +18,7 @@ local = True
 
 
 if local:
-    BACKEND_URL = "http://localhost:8000"
+    BACKEND_URL = "http://fastapi:8000"
 else:
     ip = urllib.request.urlopen("http://169.254.169.254/latest/meta-data/public-ipv4").read().decode()
     BACKEND_URL = str("http://") + str(ip) + str(":8000")
