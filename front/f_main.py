@@ -8,8 +8,29 @@ import numpy as np
 import pandas as pd
 import urllib.request
 import urllib.request
+import base64
 
 
+
+
+
+
+
+
+def set_background(png_file):
+    with open(png_file, 'rb') as f:
+        data = f.read()
+    bin_str = base64.b64encode(data).decode()
+    page_bg_img = '''
+    <style>
+    .stApp {
+    background-image: url("data:image/png;base64,%s");
+    background-size: cover;
+    }
+    </style>
+    ''' % bin_str
+    st.markdown(page_bg_img, unsafe_allow_html=True)
+    
 def is_docker():
     try:
         with open('/proc/1/cgroup', 'rt') as ifh:
@@ -22,15 +43,16 @@ columns = ['ID','Sender_IP','Sender_Port','Target_IP','Target_Port',
                'PBR','AvgPBR','TBR','Missed_Bytes','Packets_Sent','Packets_Received','SRPR']
 
 
-local = True
 
 
-if local:
-    BACKEND_URL = "http://localhost:8000"
+
+if is_docker():
+    # If we're running in a Docker container, use the service name
+    BACKEND_URL = "http://fastapi:8000"
 else:
-    if is_docker():
-        # If we're running in a Docker container, use the service name
-        BACKEND_URL = "http://fastapi:8000"
+    
+    
+    BACKEND_URL = "http://localhost:8000"
 
 
 MODELS_URL = urllib.parse.urljoin(BACKEND_URL, "models")
@@ -55,7 +77,8 @@ page = "Predict"
         
 
 if page == "Predict":
-    st.header("Hello there! 👋   Predict and check  botnet " )
+    st.markdown("<h1 style='text-align: center; color: white;'>Hello there! 👋 Predict and check botnet</h1>", unsafe_allow_html=True)
+
   
     try:
         response = requests.get(MODELS_URL)
@@ -136,31 +159,8 @@ else:
     st.write("Page does not exist")
     
 
-footer = """
-<center>
-<br>
-<br>
-<br>
-<br>
-
-</center>
-"""
-
-st.markdown(
-    """
-    <style>
-        body {
-            color: #fff;
-            background-color: #000;
-        }
-        .css-17eq0hr.e1gpkc4s0 {
-            background-color: #3498db;  /* Change to your desired sidebar color */
-        }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
 
 
+set_background('assets/IOT.jpg')
 
-st.markdown(footer, unsafe_allow_html=True)
+
