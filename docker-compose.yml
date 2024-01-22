@@ -3,6 +3,7 @@ version: "3"
 services:
   mlflow:
     build: .
+    image: medmab/ml_app:mlflow
     environment:
       - MLFLOW_TRACKING_URI=https://dagshub.com/medmabcf/N-BaIoT_mlops.mlflow 
       - MLFLOW_TRACKING_USERNAME=medmabcf 
@@ -13,6 +14,7 @@ services:
     build:
       context: ./
       dockerfile: ./backend/Dockerfile
+    image: medmab/ml_app:fastapi
     depends_on:
       - mlflow
     ports:
@@ -25,6 +27,7 @@ services:
 
   streamlit:
     build: front/
+    image: medmab/ml_app:streamlit
     depends_on:
       - fastapi
     ports:
