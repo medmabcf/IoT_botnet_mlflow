@@ -23,3 +23,7 @@ jobs:
       run: |
         docker-compose build
         docker-compose push
+
+    - name: Remove old Docker images
+      run: |
+        docker rmi $(docker images -f "dangling=true" -q)

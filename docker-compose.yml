@@ -1,28 +1,21 @@
 version: "3"
 
 services:
-  mlflow:
-    build: .
-    image: medmab/ml_app:mlflow
-    environment:
-      - MLFLOW_TRACKING_URI=https://dagshub.com/medmabcf/N-BaIoT_mlops.mlflow 
-      - MLFLOW_TRACKING_USERNAME=medmabcf 
-      - MLFLOW_TRACKING_PASSWORD=25e5112253e2706993d04c88b1965215b9ed6c91 
-    container_name: mlflow_container
-
   fastapi:
     build:
       context: ./
       dockerfile: ./backend/Dockerfile
     image: medmab/ml_app:fastapi
-    depends_on:
-      - mlflow
+    environment:
+      - MLFLOW_TRACKING_URI=https://dagshub.com/medmabcf/N-BaIoT_mlops.mlflow 
+      - MLFLOW_TRACKING_USERNAME=medmabcf 
+      - MLFLOW_TRACKING_PASSWORD=25e5112253e2706993d04c88b1965215b9ed6c91 
     ports:
       - 8000:8000
     networks:
       - deploy_network
     volumes:
-      - ./storage:/storage
+      - storage:/storage
     container_name: fastapi_container
 
   streamlit:
@@ -35,9 +28,12 @@ services:
     networks:
       - deploy_network
     volumes:
-      - ./storage:/storage
+      - storage:/storage
     container_name: streamlit_container
 
 networks:
   deploy_network:
     driver: bridge
+
+volumes:
+  storage:
