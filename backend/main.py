@@ -9,6 +9,8 @@ import mlflow
 from mlflow.tracking import MlflowClient
 import sys
 from ml.data import  preprocessing, config
+from typing import Any, Dict
+from backend.models import  PredictModel
 remote_server_uri="https://dagshub.com/medmabcf/N-BaIoT_mlops.mlflow"
 mlflow.set_tracking_uri(remote_server_uri)
 mlflowclient = MlflowClient(
@@ -17,14 +19,9 @@ mlflowclient = MlflowClient(
 run_id = df_mlflow.loc[df_mlflow['metrics.f1_score'].idxmax()]['run_id']
 runname = df_mlflow.loc[df_mlflow['metrics.f1_score'].idxmax()]['tags.mlflow.runName']    """
 
-from backend.models import  PredictModel
-from fastapi import FastAPI
-from pydantic import BaseModel
-from typing import Any, Dict
 
-class Item(BaseModel):
-    data: Any
-    modelname: Any
+
+
 
 app = FastAPI()
 
@@ -70,10 +67,8 @@ async def predict(data: PredictModel):
     print([data.data])
     df = pd.DataFrame([data.data], columns = cols)
     df=preprocessing(df)
-    print(df)
     model = mlflow.sklearn.load_model(model_uri=f"models:/{model_name}/None")
     pred = np.round(model.predict_proba(df)[:, 1], 6)
-    print(pred)
     return {"result": pred[0]}
 
 
